@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <style>
+    .lang-row{display:flex;align-items:center;width:100%;background:var(--surface);border:1px solid var(--line-soft);border-radius:16px;padding:18px 20px;margin:12px 0;cursor:pointer;font-family:inherit;box-shadow:var(--shadow-card);transition:transform .18s var(--spring),background .2s;}
+    .lang-row:active{transform:scale(.98);background:var(--surface-2);}
+    .lang-native{font-size:20px;font-weight:600;letter-spacing:-0.01em;color:var(--ink);}
+    .lang-en{margin-left:auto;margin-right:10px;font-size:14px;color:var(--muted);}
+    .chev{font-size:22px;color:var(--muted);line-height:1;}
+    .page-title{font-size:30px;font-weight:700;letter-spacing:-0.03em;margin:20px 2px 6px;}
+    .page-sub{color:var(--muted);font-size:15px;margin:0 2px 8px;}
+    .divider{text-align:center;margin:20px 0;color:var(--muted);font-size:14px;}
+  </style>
+</head>
+<body>
+
+<!-- ============ LANGUAGE SCREEN ============ -->
+<div id="langScreen">
+  <div class="topbar">
+    <div class="logo">KC</div>
+    <div><h1 class="brand">Karigar Connect</h1><small>Jewellery worker registration</small></div>
+  </div>
+  <div class="wrap stagger" style="padding-top:20px;">
+    <div class="page-title">अपनी भाषा चुनें</div>
+    <div class="page-sub">Choose your language</div>
+    <button class="lang-row" onclick="setLang('bn')"><span class="lang-native">বাংলা</span><span class="lang-en">Bengali</span><span class="chev">›</span></button>
+    <button class="lang-row" onclick="setLang('mr')"><span class="lang-native">मराठी</span><span class="lang-en">Marathi</span><span class="chev">›</span></button>
+    <button class="lang-row" onclick="setLang('hi')"><span class="lang-native">हिंदी</span><span class="lang-en">Hindi</span><span class="chev">›</span></button>
+    <button class="lang-row" onclick="setLang('en')"><span class="lang-native">English</span><span class="lang-en">English</span><span class="chev">›</span></button>
+  </div>
+</div>
+
+<!-- ============ FORM SCREEN ============ -->
+<div id="formScreen" class="hidden">
+  <div class="topbar">
+    <div class="logo">KC</div>
+    <div style="flex:1"><h1 class="brand">Karigar Connect</h1><small data-i18n="subtitleApp"></small></div>
+    <button class="globe-btn" onclick="backToLang()">🌐</button>
+  </div>
+
+  <div class="wrap stagger" style="padding-top:16px;">
+
+    <!-- Resume upload: always shown. Auto-fill needs a key; saving the file does not. -->
+    <div class="card upload-card">
+      <div style="font-weight:600;margin-bottom:6px;">Upload CV / Resume <span class="muted">(optional)</span></div>
+      <div class="hint" style="margin-bottom:12px;">Saved with the candidate profile. If CV reading is set up, the form also auto-fills.</div>
+      <button class="btn btn-gold" onclick="document.getElementById('cvInput').click()">📄 Choose CV / Resume</button>
+      <input id="cvInput" type="file" accept="image/*,application/pdf,.doc,.docx" class="hidden" onchange="onCvChosen(this)">
+      <div id="cvStatus" class="center muted" style="margin-top:12px;font-size:14px;"></div>
+    </div>
+
+    <div class="divider" data-i18n="orManual"></div>
+
+    <!-- Name / Mobile / Area -->
+    <div class="card">
+      <div class="field" id="f-name">
+        <label data-i18n="nameLabel"></label>
+        <input id="name" type="text" autocomplete="off">
+        <div class="err-text" data-i18n="errName"></div>
+      </div>
+      <div class="field" id="f-mobile">
+        <label data-i18n="mobileLabel"></label>
+        <input id="mobile" type="tel" inputmode="numeric" maxlength="10" autocomplete="off">
+        <div class="hint" data-i18n="mobileHint"></div>
+        <div class="err-text" data-i18n="errMobile"></div>
+      </div>
+      <div class="field" id="f-area">
+        <label data-i18n="areaLabel"></label>
+        <input id="area" type="text" autocomplete="off">
+        <div class="hint" data-i18n="areaHint"></div>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="field" id="f-skills">
+      <label data-i18n="skillsLabel"></label>
+      <div class="skill-grid" id="skillGrid"></div>
+      <div class="err-text" data-i18n="errSkill"></div>
+    </div>
+
+    <!-- Experience / Salary / Availability -->
+    <div class="card">
+      <div class="field" id="f-exp">
+        <label data-i18n="expLabel"></label>
+        <input id="experience" type="number" inputmode="numeric" min="0" max="60" autocomplete="off">
+      </div>
+      <div class="field" id="f-salary">
+        <label data-i18n="salaryLabel"></label>
+        <input id="salary" type="number" inputmode="numeric" min="0" autocomplete="off">
+        <div class="hint" data-i18n="salaryHint"></div>
+      </div>
+      <div class="field" id="f-avail">
+        <label data-i18n="availLabel"></label>
+        <div class="chips" id="availChips"></div>
+      </div>
+    </div>
+
+    <!-- Photo -->
+    <div class="field" id="f-photo">
+      <label data-i18n="photoLabel"></label>
+      <button class="btn btn-ghost" onclick="document.getElementById('photoInput').click()" data-i18n="photoBtn"></button>
+      <input id="photoInput" type="file" accept="image/*" capture="user" class="hidden" onchange="onPhotoChosen(this)">
+      <div id="photoStatus" class="muted center" style="margin-top:10px;font-size:14px;"></div>
+    </div>
+
+    <hr class="hr">
+    <button id="submitBtn" class="btn btn-primary" onclick="submitForm()"><span data-i18n="submitBtn"></span></button>
+  </div>
+</div>
+
+<!-- ============ SUCCESS SCREEN ============ -->
+<div id="successScreen" class="hidden">
+  <div class="topbar">
+    <div class="logo">KC</div>
+    <div><h1 class="brand">Karigar Connect</h1></div>
+  </div>
+  <div class="wrap center stagger" style="padding-top:44px;">
+    <div class="success-check">
+      <svg viewBox="0 0 72 72" aria-hidden="true">
+        <circle cx="36" cy="36" r="33"/>
+        <path d="M22 37 L32 47 L51 27"/>
+      </svg>
+    </div>
+    <h2 style="color:var(--ink);margin:8px 0 8px;font-size:26px;font-weight:700;letter-spacing:-0.02em;" data-i18n="successTitle"></h2>
+    <p class="muted" style="margin:0 0 14px;"><span data-i18n="successMsg"></span></p>
+    <div class="id-pill" id="profileId"></div>
+    <div style="margin-top:28px;">
+      <a id="downloadCv" class="btn btn-gold" style="text-decoration:none;" download><span data-i18n="downloadBtn"></span></a>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:14px;" onclick="resetAll()" data-i18n="againBtn"></button>
+  </div>
+</div>
+
+<script>
+/* ---------------- i18n ---------------- */
+var I18N = {
+  en:{subtitleApp:"Jewellery karigar registration",haveCVTitle:"Already have a resume? Upload it and we'll fill the form for you.",uploadBtn:"📄 Upload resume",reading:"Reading your resume…",filledFromCV:"We filled the form from your resume. Please check it.",cvReadFail:"Couldn't read it. Please fill the form below.",orManual:"— or fill the form yourself —",nameLabel:"Your full name",mobileLabel:"Mobile number",mobileHint:"10-digit number",areaLabel:"Your area",areaHint:"Example: Zaveri Bazaar, Bhuleshwar",skillsLabel:"What work do you do? Choose one or more.",expLabel:"Years of experience",salaryLabel:"Expected salary per month (₹)",salaryHint:"Leave empty if not sure",availLabel:"When can you join?",photoLabel:"Your photo (optional)",photoBtn:"📷 Add photo",photoAdded:"Photo added ✓",submitBtn:"Register now",submitting:"Saving…",errName:"Please enter your name",errMobile:"Enter a valid 10-digit mobile number",errSkill:"Choose at least one type of work",successTitle:"Done! You're registered.",successMsg:"Jewellery companies can now find you. Your profile ID:",downloadBtn:"⬇ Download my CV",againBtn:"Register another person"},
+  hi:{subtitleApp:"ज्वेलरी कारीगर रजिस्ट्रेशन",haveCVTitle:"क्या आपके पास रिज़्यूमे है? अपलोड करें, हम फॉर्म भर देंगे।",uploadBtn:"📄 रिज़्यूमे अपलोड करें",reading:"आपका रिज़्यूमे पढ़ा जा रहा है…",filledFromCV:"हमने आपके रिज़्यूमे से फॉर्म भर दिया है। कृपया जाँच लें।",cvReadFail:"पढ़ नहीं पाए। कृपया नीचे फॉर्म भरें।",orManual:"— या खुद फॉर्म भरें —",nameLabel:"आपका पूरा नाम",mobileLabel:"मोबाइल नंबर",mobileHint:"10 अंकों का नंबर",areaLabel:"आपका इलाका",areaHint:"जैसे: ज़वेरी बाज़ार, भुलेश्वर",skillsLabel:"आप क्या काम करते हैं? एक या ज़्यादा चुनें।",expLabel:"कितने साल का अनुभव?",salaryLabel:"हर महीने की चाही गई सैलरी (₹)",salaryHint:"पक्का न हो तो खाली छोड़ें",availLabel:"आप कब काम शुरू कर सकते हैं?",photoLabel:"आपकी फ़ोटो (वैकल्पिक)",photoBtn:"📷 फ़ोटो जोड़ें",photoAdded:"फ़ोटो जुड़ गई ✓",submitBtn:"अभी रजिस्टर करें",submitting:"सेव हो रहा है…",errName:"कृपया अपना नाम लिखें",errMobile:"सही 10 अंकों का मोबाइल नंबर डालें",errSkill:"कम से कम एक काम चुनें",successTitle:"हो गया! आप रजिस्टर हो गए।",successMsg:"अब ज्वेलरी कंपनियाँ आपको ढूँढ सकती हैं। आपकी प्रोफाइल ID:",downloadBtn:"⬇ मेरा CV डाउनलोड करें",againBtn:"दूसरे व्यक्ति को रजिस्टर करें"},
+  mr:{subtitleApp:"ज्वेलरी कारागीर नोंदणी",haveCVTitle:"तुमच्याकडे रेझ्युमे आहे का? अपलोड करा, आम्ही फॉर्म भरतो.",uploadBtn:"📄 रेझ्युमे अपलोड करा",reading:"तुमचा रेझ्युमे वाचत आहोत…",filledFromCV:"तुमच्या रेझ्युमेवरून फॉर्म भरला आहे. कृपया तपासा.",cvReadFail:"वाचता आले नाही. कृपया खालचा फॉर्म भरा.",orManual:"— किंवा स्वतः फॉर्म भरा —",nameLabel:"तुमचे पूर्ण नाव",mobileLabel:"मोबाईल नंबर",mobileHint:"10 अंकी नंबर",areaLabel:"तुमचा परिसर",areaHint:"उदा.: झवेरी बाजार, भुलेश्वर",skillsLabel:"तुम्ही कोणते काम करता? एक किंवा अधिक निवडा.",expLabel:"किती वर्षांचा अनुभव?",salaryLabel:"दरमहा अपेक्षित पगार (₹)",salaryHint:"खात्री नसेल तर रिकामे ठेवा",availLabel:"तुम्ही कधी कामावर येऊ शकता?",photoLabel:"तुमचा फोटो (पर्यायी)",photoBtn:"📷 फोटो जोडा",photoAdded:"फोटो जोडला ✓",submitBtn:"आता नोंदणी करा",submitting:"सेव्ह होत आहे…",errName:"कृपया तुमचे नाव लिहा",errMobile:"योग्य 10 अंकी मोबाईल नंबर टाका",errSkill:"किमान एक काम निवडा",successTitle:"झाले! तुमची नोंदणी झाली.",successMsg:"आता ज्वेलरी कंपन्या तुम्हाला शोधू शकतात. तुमचा प्रोफाइल ID:",downloadBtn:"⬇ माझा CV डाउनलोड करा",againBtn:"दुसऱ्या व्यक्तीची नोंदणी करा"},
+  bn:{subtitleApp:"জুয়েলারি কারিগর নিবন্ধন",haveCVTitle:"আপনার কি রেজ্যুমে আছে? আপলোড করুন, আমরা ফর্ম পূরণ করে দেব।",uploadBtn:"📄 রেজ্যুমে আপলোড করুন",reading:"আপনার রেজ্যুমে পড়া হচ্ছে…",filledFromCV:"আপনার রেজ্যুমে থেকে ফর্ম পূরণ করা হয়েছে। দয়া করে দেখে নিন।",cvReadFail:"পড়া গেল না। দয়া করে নিচের ফর্ম পূরণ করুন।",orManual:"— অথবা নিজে ফর্ম পূরণ করুন —",nameLabel:"আপনার পুরো নাম",mobileLabel:"মোবাইল নম্বর",mobileHint:"১০ সংখ্যার নম্বর",areaLabel:"আপনার এলাকা",areaHint:"যেমন: জাভেরি বাজার, ভুলেশ্বর",skillsLabel:"আপনি কী কাজ করেন? এক বা একাধিক বেছে নিন।",expLabel:"কত বছরের অভিজ্ঞতা?",salaryLabel:"প্রতি মাসে প্রত্যাশিত বেতন (₹)",salaryHint:"নিশ্চিত না হলে খালি রাখুন",availLabel:"আপনি কখন কাজে যোগ দিতে পারবেন?",photoLabel:"আপনার ছবি (ঐচ্ছিক)",photoBtn:"📷 ছবি যোগ করুন",photoAdded:"ছবি যোগ হয়েছে ✓",submitBtn:"এখনই নিবন্ধন করুন",submitting:"সেভ হচ্ছে…",errName:"দয়া করে আপনার নাম লিখুন",errMobile:"সঠিক ১০ সংখ্যার মোবাইল নম্বর দিন",errSkill:"অন্তত একটি কাজ বেছে নিন",successTitle:"হয়ে গেছে! আপনি নিবন্ধিত হয়েছেন।",successMsg:"এখন জুয়েলারি কোম্পানিগুলো আপনাকে খুঁজে পাবে। আপনার প্রোফাইল ID:",downloadBtn:"⬇ আমার CV ডাউনলোড করুন",againBtn:"আরেকজনকে নিবন্ধন করুন"}
+};
+
+/* key = value stored in sheet (English/searchable); label = shown to worker */
+var SKILLS = [
+  {key:'Stone Setting', ic:'💎', en:'Stone Setting', hi:'जड़ाई', mr:'जडाई', bn:'সেটিং'},
+  {key:'Polishing',     ic:'✨', en:'Polishing',     hi:'पॉलिश', mr:'पॉलिश', bn:'পলিশ'},
+  {key:'Filing',        ic:'🔧', en:'Filing',        hi:'घिसाई', mr:'घासणी', bn:'ঘষাই'},
+  {key:'Soldering',     ic:'🔥', en:'Soldering',     hi:'टांका', mr:'टाका', bn:'ঝালাই'},
+  {key:'Casting',       ic:'🏺', en:'Casting',       hi:'ढलाई', mr:'ओतकाम', bn:'ঢালাই'},
+  {key:'Wax Setting',   ic:'🕯️', en:'Wax Setting',  hi:'वैक्स', mr:'वॅक्स', bn:'ওয়াক্স'},
+  {key:'Kundan',        ic:'👑', en:'Kundan',        hi:'कुंदन', mr:'कुंदन', bn:'কুন্দন'},
+  {key:'Meena (Enamel)',ic:'🎨', en:'Meena',         hi:'मीना', mr:'मीना', bn:'মীনা'},
+  {key:'Chain Making',  ic:'🔗', en:'Chain Making',  hi:'चेन', mr:'चेन', bn:'চেইন'},
+  {key:'Designing / CAD',ic:'✏️',en:'Design / CAD',  hi:'डिज़ाइन', mr:'डिझाइन', bn:'ডিজাইন'},
+  {key:'Repairing',     ic:'🛠️', en:'Repairing',    hi:'मरम्मत', mr:'दुरुस्ती', bn:'মেরামত'},
+  {key:'Helper',        ic:'🤝', en:'Helper',        hi:'हेल्पर', mr:'मदतनीस', bn:'সহকারী'}
+];
+var AVAIL = [
+  {key:'Immediate',         en:'Immediately', hi:'तुरंत', mr:'लगेच', bn:'এখনই'},
+  {key:'Within 15 days',    en:'In 15 days',  hi:'15 दिन में', mr:'15 दिवसांत', bn:'১৫ দিনে'},
+  {key:'Within 1 month',    en:'In 1 month',  hi:'1 महीने में', mr:'1 महिन्यात', bn:'১ মাসে'},
+  {key:'Currently working', en:'Working now', hi:'अभी काम कर रहा हूँ', mr:'सध्या काम करत आहे', bn:'এখন কাজ করছি'}
+];
+
+/* ---------------- state ---------------- */
+var state = { lang:'en', skills:[], availability:'', resume:null, photo:null };
+
+function setLang(l){
+  state.lang = l;
+  applyI18n();
+  buildSkills();
+  buildAvail();
+  document.getElementById('langScreen').classList.add('hidden');
+  document.getElementById('formScreen').classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+function backToLang(){
+  document.getElementById('formScreen').classList.add('hidden');
+  document.getElementById('langScreen').classList.remove('hidden');
+}
+function applyI18n(){
+  var t = I18N[state.lang];
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var k = el.getAttribute('data-i18n'); if(t[k]!==undefined) el.textContent = t[k];
+  });
+}
+function buildSkills(){
+  var g = document.getElementById('skillGrid'); g.innerHTML='';
+  SKILLS.forEach(function(s){
+    var d = document.createElement('div');
+    d.className = 'skill' + (state.skills.indexOf(s.key)>-1?' on':'');
+    d.innerHTML = '<span class="ic">'+s.ic+'</span><span class="nm">'+(s[state.lang]||s.en)+'</span>';
+    d.onclick = function(){
+      var i = state.skills.indexOf(s.key);
+      if(i>-1){ state.skills.splice(i,1); d.classList.remove('on'); }
+      else { state.skills.push(s.key); d.classList.add('on'); }
+      document.getElementById('f-skills').classList.remove('invalid');
+    };
+    g.appendChild(d);
+  });
+}
+function buildAvail(){
+  var c = document.getElementById('availChips'); c.innerHTML='';
+  AVAIL.forEach(function(a){
+    var d = document.createElement('div');
+    d.className = 'chip' + (state.availability===a.key?' on':'');
+    d.textContent = a[state.lang]||a.en;
+    d.onclick = function(){
+      state.availability = a.key;
+      c.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on');});
+      d.classList.add('on');
+    };
+    c.appendChild(d);
+  });
+}
+
+/* ---------------- file helpers ---------------- */
+function fileToBase64(file){
+  return new Promise(function(res,rej){
+    var r = new FileReader();
+    r.onload = function(){ res({ base64: r.result.split(',')[1], mimeType: file.type, fileName: file.name }); };
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function resumeSavedText(){
+  return {
+    en:'Resume selected ✓ It will be saved with the profile.',
+    hi:'रिज़्यूमे चुना गया ✓ यह प्रोफाइल के साथ सेव होगा.',
+    mr:'रेझ्युमे निवडला ✓ तो प्रोफाइलसोबत सेव होईल.',
+    bn:'রেজ্যুমে নির্বাচন হয়েছে ✓ এটি প্রোফাইলের সঙ্গে সেভ হবে.'
+  }[state.lang] || 'Resume selected ✓ It will be saved with the profile.';
+}
+
+/* ---------------- CV auto-fill ---------------- */
+function onCvChosen(input){
+  if(!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if(file.size > 12*1024*1024){ document.getElementById('cvStatus').textContent = 'File too large (max 12 MB).'; return; }
+  var t = I18N[state.lang];
+  var status = document.getElementById('cvStatus');
+  status.innerHTML = '<span class="spin" style="border-color:rgba(0,113,227,.25);border-top-color:var(--accent);"></span> '+t.reading;
+  fileToBase64(file).then(function(f){
+    state.resume = f; // keep to submit even if parsing fails
+    api('parseCV', {file:f})
+      .then(function(resp){
+        if(resp && resp.success && resp.data){
+          fillFromParsed(resp.data);
+          status.textContent = t.filledFromCV; status.style.color = 'var(--ok)';
+        } else if(resp && resp.message === 'NO_KEY'){
+          status.textContent = resumeSavedText(); status.style.color = 'var(--ok)';
+        } else {
+          status.textContent = resumeSavedText() + ' Auto-fill could not read it, please fill the form manually.';
+          status.style.color = 'var(--muted)';
+        }
+      })
+      .catch(function(){ status.textContent = resumeSavedText(); status.style.color = 'var(--ok)'; });
+  });
+}
+function fillFromParsed(d){
+  if(d.name) document.getElementById('name').value = d.name;
+  if(d.mobile) document.getElementById('mobile').value = String(d.mobile).replace(/\D/g,'').slice(-10);
+  if(d.location) document.getElementById('area').value = d.location;
+  if(d.experienceYears) document.getElementById('experience').value = d.experienceYears;
+  if(d.expectedSalary) document.getElementById('salary').value = d.expectedSalary;
+  // match skills by keyword
+  if(Array.isArray(d.skills)){
+    d.skills.forEach(function(sk){
+      var low = String(sk).toLowerCase();
+      SKILLS.forEach(function(s){
+        var hit = s.key.toLowerCase().split(/[ /()]+/).some(function(w){ return w && low.indexOf(w)>-1; });
+        if(hit && state.skills.indexOf(s.key)===-1) state.skills.push(s.key);
+      });
+    });
+    buildSkills();
+  }
+  if(d.availability){
+    var al = String(d.availability).toLowerCase();
+    if(al.indexOf('immediate')>-1||al.indexOf('now')>-1) state.availability='Immediate';
+    else if(al.indexOf('working')>-1) state.availability='Currently working';
+    buildAvail();
+  }
+}
+
+/* ---------------- photo ---------------- */
+function onPhotoChosen(input){
+  if(!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if(file.size > 8*1024*1024){ document.getElementById('photoStatus').textContent='Photo too large (max 8 MB).'; return; }
+  fileToBase64(file).then(function(f){ state.photo=f; document.getElementById('photoStatus').textContent=I18N[state.lang].photoAdded; document.getElementById('photoStatus').style.color='var(--ok)'; });
+}
+
+/* ---------------- submit ---------------- */
+function submitForm(){
+  var t = I18N[state.lang];
+  var ok = true;
+  var name = document.getElementById('name').value.trim();
+  var mobile = document.getElementById('mobile').value.replace(/\D/g,'');
+  setInvalid('f-name', name.length<2); if(name.length<2) ok=false;
+  setInvalid('f-mobile', !/^[6-9]\d{9}$/.test(mobile)); if(!/^[6-9]\d{9}$/.test(mobile)) ok=false;
+  setInvalid('f-skills', state.skills.length===0); if(state.skills.length===0) ok=false;
+  if(!ok){ document.querySelector('.invalid').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> '+t.submitting;
+
+  var payload = {
+    name:name, mobile:mobile,
+    area:document.getElementById('area').value.trim(),
+    skills:state.skills,
+    experience:document.getElementById('experience').value,
+    expectedSalary:document.getElementById('salary').value,
+    availability:state.availability,
+    language:state.lang,
+    resume:state.resume, photo:state.photo
+  };
+
+  api('register', {payload:payload})
+    .then(function(resp){
+      if(resp && resp.success){ showSuccess(resp); }
+      else { btn.disabled=false; btn.innerHTML='<span>'+t.submitBtn+'</span>'; alert('Error: '+(resp&&resp.message||'unknown') + (resp&&resp.detail ? '\n' + resp.detail : '')); }
+    })
+    .catch(function(e){ btn.disabled=false; btn.innerHTML='<span>'+t.submitBtn+'</span>'; alert('Network/server error: ' + (e && e.message ? e.message : e)); });
+}
+function setInvalid(id, bad){ document.getElementById(id).classList.toggle('invalid', !!bad); }
+
+function showSuccess(resp){
+  document.getElementById('formScreen').classList.add('hidden');
+  document.getElementById('successScreen').classList.remove('hidden');
+  applyI18n();
+  document.getElementById('profileId').textContent = resp.id;
+  var a = document.getElementById('downloadCv');
+  if(resp.cv && resp.cv.base64){
+    a.href = 'data:application/pdf;base64,'+resp.cv.base64;
+    a.setAttribute('download', resp.cv.fileName || 'Karigar CV.pdf');
+    a.classList.remove('hidden');
+  } else { a.classList.add('hidden'); }
+  window.scrollTo(0,0);
+}
+function resetAll(){ window.location.href = window.location.href.split('#')[0]; }
+
+function clearClientForm(){
+  ['name','mobile','area','experience','salary'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value = '';
+  });
+  var cv = document.getElementById('cvInput'); if(cv) cv.value = '';
+  var ph = document.getElementById('photoInput'); if(ph) ph.value = '';
+  var cs = document.getElementById('cvStatus'); if(cs) cs.textContent = '';
+  var ps = document.getElementById('photoStatus'); if(ps) ps.textContent = '';
+  state.skills = []; state.availability = ''; state.resume = null; state.photo = null;
+}
+clearClientForm();
+window.addEventListener('pageshow', function(e){ if(e.persisted) clearClientForm(); });
+</script>
+</body>
+</html>

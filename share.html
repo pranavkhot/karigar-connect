@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
+  <style>
+    .qrbox{background:var(--surface);border:1px solid var(--line-soft);border-radius:var(--r-card);padding:24px;text-align:center;box-shadow:var(--shadow-card);margin-bottom:18px;}
+    .qrbox h3{margin:0 0 4px;color:var(--ink);font-size:19px;font-weight:600;letter-spacing:-0.02em;}
+    .qr{display:inline-block;padding:16px;background:#fff;border-radius:16px;border:1px solid var(--line-soft);}
+    .urlline{word-break:break-all;font-size:13px;color:var(--muted);margin-top:12px;}
+    @media print{.noprint{display:none!important;} .topbar{display:none;} .qrbox{box-shadow:none;border:none;}}
+  </style>
+</head>
+<body>
+  <div class="topbar noprint">
+    <div class="logo">KC</div>
+    <div><h1 class="brand">Karigar Connect</h1><small>Share &amp; QR codes</small></div>
+  </div>
+
+  <div class="wrap stagger" style="padding-top:20px;">
+    <!-- Registration QR -->
+    <div class="qrbox">
+      <h3>Register here</h3>
+      <p class="muted" style="margin:0 0 16px;font-size:14px;">Karigars scan this to open the form</p>
+      <div class="qr" id="qrForm"></div>
+      <div class="urlline" id="formUrl"></div>
+    </div>
+
+    <!-- WhatsApp coordinator -->
+    <div class="qrbox noprint">
+      <h3>WhatsApp front door</h3>
+      <p class="muted" style="font-size:14px;margin:0 0 14px;">Enter a coordinator's WhatsApp number. Workers message this for help registering.</p>
+      <input id="waNum" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit number" style="margin-bottom:14px;">
+      <button class="btn btn-primary" onclick="makeWa()">Make WhatsApp link &amp; QR</button>
+      <div id="waOut" class="hidden" style="margin-top:18px;">
+        <div class="qr" id="qrWa"></div>
+        <div class="urlline" id="waUrl"></div>
+        <button class="btn btn-ghost" style="margin-top:12px;" onclick="copyWa()">Copy link</button>
+      </div>
+    </div>
+
+    <button class="btn btn-gold noprint" onclick="window.print()">🖨️ Print these QR codes</button>
+  </div>
+
+<script>
+var FORM_URL = window.location.origin + '/';
+document.getElementById('formUrl').textContent = FORM_URL;
+new QRCode(document.getElementById('qrForm'), { text:FORM_URL, width:200, height:200, colorDark:'#1D1D1F', colorLight:'#ffffff' });
+
+function makeWa(){
+  var n = document.getElementById('waNum').value.replace(/\D/g,'');
+  if(n.length!==10){ alert('Enter a valid 10-digit number'); return; }
+  var msg = encodeURIComponent('Hello, I want to register as a jewellery karigar.');
+  var link = 'https://wa.me/91'+n+'?text='+msg;
+  document.getElementById('waUrl').textContent = link;
+  var box=document.getElementById('qrWa'); box.innerHTML='';
+  new QRCode(box, { text:link, width:200, height:200, colorDark:'#34C759', colorLight:'#ffffff' });
+  document.getElementById('waOut').classList.remove('hidden');
+  window._waLink = link;
+}
+function copyWa(){ if(window._waLink){ navigator.clipboard.writeText(window._waLink).then(function(){ alert('Link copied'); }); } }
+</script>
+</body>
+</html>
