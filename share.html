@@ -3,6 +3,7 @@
 <head>
   <base target="_top">
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <link rel="stylesheet" href="styles.css">
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
@@ -48,7 +49,7 @@
 <script>
 var FORM_URL = window.location.origin + '/';
 document.getElementById('formUrl').textContent = FORM_URL;
-new QRCode(document.getElementById('qrForm'), { text:FORM_URL, width:200, height:200, colorDark:'#1D1D1F', colorLight:'#ffffff' });
+new QRCode(document.getElementById('qrForm'), { text:FORM_URL, width:200, height:200, colorDark:'#241A1A', colorLight:'#ffffff' });
 
 function makeWa(){
   var n = document.getElementById('waNum').value.replace(/\D/g,'');
@@ -57,7 +58,7 @@ function makeWa(){
   var link = 'https://wa.me/91'+n+'?text='+msg;
   document.getElementById('waUrl').textContent = link;
   var box=document.getElementById('qrWa'); box.innerHTML='';
-  new QRCode(box, { text:link, width:200, height:200, colorDark:'#34C759', colorLight:'#ffffff' });
+  new QRCode(box, { text:link, width:200, height:200, colorDark:'#25D366', colorLight:'#ffffff' });
   document.getElementById('waOut').classList.remove('hidden');
   window._waLink = link;
 }

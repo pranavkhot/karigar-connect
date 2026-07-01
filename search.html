@@ -3,6 +3,7 @@
 <head>
   <base target="_top">
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <link rel="stylesheet" href="styles.css">
   <script src="config.js"></script>
   <style>
@@ -12,14 +13,14 @@
     .result h3{margin:0 0 3px;color:var(--ink);font-size:19px;font-weight:600;letter-spacing:-0.02em;}
     .result .meta{color:var(--muted);font-size:13px;margin-bottom:10px;}
     .tags{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0;}
-    .tag{background:rgba(0,113,227,.10);color:var(--accent);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;}
+    .tag{background:rgba(122,31,43,.10);color:var(--accent);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;}
     .kv{display:flex;gap:20px;flex-wrap:wrap;font-size:14px;margin:8px 0 2px;color:var(--muted);}
     .kv b{color:var(--ink);font-weight:600;}
     .actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
     .actions a{flex:1;min-width:118px;text-decoration:none;text-align:center;padding:13px;border-radius:12px;font-weight:600;font-size:15px;letter-spacing:-0.01em;transition:transform .18s var(--spring),opacity .2s;}
     .actions a:active{transform:scale(.97);}
-    .a-call{background:var(--ink);color:#fff;}
-    .a-wa{background:#34C759;color:#fff;}
+    .a-call{background:var(--accent);color:#fff;}
+    .a-wa{background:var(--green);color:#fff;}
     .a-cv{background:rgba(0,0,0,.05);color:var(--ink);}
     .statbar{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;box-shadow:var(--shadow-card);}
     .statbar b{font-size:20px;letter-spacing:-0.02em;}
@@ -113,7 +114,7 @@ function logout(){ PW=''; document.getElementById('app').classList.add('hidden')
 
 function runSearch(){
   var results = document.getElementById('results');
-  results.innerHTML = '<div class="center muted" style="padding:30px;"><span class="spin" style="border-color:rgba(0,113,227,.25);border-top-color:var(--accent);"></span> Searching…</div>';
+  results.innerHTML = '<div class="center muted" style="padding:30px;"><span class="spin" style="border-color:rgba(122,31,43,.25);border-top-color:var(--accent);"></span> Searching…</div>';
   var filters = {
     password: PW,
     skill: document.getElementById('fSkill').value,
